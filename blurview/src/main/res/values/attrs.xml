@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BlurView">
+        <attr name="blv_overlayColor" format="color"/>
+        <attr name="blv_hasRound" format="boolean" />
+        <attr name="blv_roundRadius" format="dimension" />
+    </declare-styleable>
+</resources>

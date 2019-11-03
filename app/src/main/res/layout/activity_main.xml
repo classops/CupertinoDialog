@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/btnAlert"
+        android:text="Alert"
+        android:textSize="18dp"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:background="@drawable/btn_round_8dp"
+        android:layout_width="215dp"
+        android:textColor="#FFF"
+        android:onClick="onClick"
+        android:textAllCaps="false"
+        android:layout_marginTop="18dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="52dp" />
+
+    <Button
+        android:id="@+id/btnAlertWithTitle"
+        android:text="Alert with Title"
+        android:textSize="18dp"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:background="@drawable/btn_round_8dp"
+        android:layout_width="215dp"
+        android:textColor="#FFF"
+        android:onClick="onClick"
+        android:textAllCaps="false"
+        android:layout_marginTop="18dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="52dp" />
+
+
+    <Button
+        android:id="@+id/btnAlertWithButton"
+        android:text="Alert With Button"
+        android:textSize="18dp"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:background="@drawable/btn_round_8dp"
+        android:layout_width="215dp"
+        android:textColor="#FFF"
+        android:onClick="onClick"
+        android:layout_marginTop="18dp"
+        android:textAllCaps="false"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="52dp" />
+
+
+    <Button
+        android:id="@+id/btnAlertButtonOnly"
+        android:text="Alert Button Only"
+        android:textSize="18dp"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:background="@drawable/btn_round_8dp"
+        android:layout_width="215dp"
+        android:textColor="#FFF"
+        android:onClick="onClick"
+        android:layout_marginTop="18dp"
+        android:textAllCaps="false"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="52dp" />
+
+
+    <Button
+        android:id="@+id/btnActionSheet"
+        android:text="Action Sheet"
+        android:textSize="18dp"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:background="@drawable/btn_round_8dp"
+        android:layout_width="215dp"
+        android:textColor="#FFF"
+        android:onClick="onClick"
+        android:layout_marginTop="18dp"
+        android:textAllCaps="false"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="52dp" />
+
+
+</LinearLayout>

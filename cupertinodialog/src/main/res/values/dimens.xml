@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="cupertino_dialog_corner_radius">12dp</dimen>
+
+    <dimen name="action_sheet_content_padding_horizontal">40dp</dimen>
+    <dimen name="action_sheet_content_padding_vertical">14dp</dimen>
+
+    <dimen name="action_sheet_message_padding_top_without_title">22dp</dimen>
+    <dimen name="action_sheet_message_padding_bottom_without_title">0dp</dimen>
+
+    <dimen name="cupertino_alert_edge_padding">20dp</dimen>
+    <dimen name="cupertino_alert_extra_padding">1dp</dimen>
+</resources>

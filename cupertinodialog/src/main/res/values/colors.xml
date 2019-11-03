@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="action_sheet_divider">#403F3F3F</color>
+    <color name="action_sheet_divider_pressed">#A6E5E5EA</color>
+
+    <color name="cupertino_alert_overlay">#C0FFFFFF</color>
+    <color name="cupertino_alert_overlay_pressed">#90FFFFFF</color>
+    <color name="cupertino_alert_button_divider">#40FFFFFF</color>
+
+    <color name="cupertinoDestructiveRed">#FF3B30</color>
+    <color name="cupertinoActiveBlue">#007AFF</color>
+    <color name="cupertinoActiveGreen">#FF4CD964</color>
+    <color name="cupertinoActiveOrange">#FFFF9500</color>
+
+    <color name="actionSheetDialogOverlay">#D1F8F8F8</color>
+</resources>
