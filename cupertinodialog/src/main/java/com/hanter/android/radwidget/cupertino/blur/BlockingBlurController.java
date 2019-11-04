@@ -1,4 +1,4 @@
-package eightbitlab.com.blurview;
+package com.hanter.android.radwidget.cupertino.blur;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,7 +9,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;

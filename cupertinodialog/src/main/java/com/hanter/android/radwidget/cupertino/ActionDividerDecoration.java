@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * @author wangmingshuo
  * @version 1.0
  */
-public class ActionDividerDecoration extends RecyclerView.ItemDecoration {
+class ActionDividerDecoration extends RecyclerView.ItemDecoration {
 
     private static final String TAG = "ActionSheetDividerDecor";
 

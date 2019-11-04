@@ -1,50 +1,37 @@
-package eightbitlab.com.blurview;
+package com.hanter.android.radwidget.cupertino.blur;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.os.Build;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
+import androidx.renderscript.Allocation;
+import androidx.renderscript.Element;
+import androidx.renderscript.RenderScript;
+import androidx.renderscript.ScriptIntrinsicBlur;
+
+import com.hanter.android.radwidget.cupertino.ScriptC_BlendOverlay;
 
 /**
  * Blur using RenderScript, processed on GPU.
- * Requires API 17+
+ * Uses Renderscript from support library
  */
-public final class RenderScriptBlur implements BlurAlgorithm {
-    private boolean drawOverlay;
-    private int overlayColor;
+public final class SupportRenderScriptBlur implements BlurAlgorithm {
     private final RenderScript renderScript;
     private final ScriptIntrinsicBlur blurScript;
+    private ScriptC_BlendOverlay overlayScript;
     private Allocation outAllocation;
 
     private int lastBitmapWidth = -1;
     private int lastBitmapHeight = -1;
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
-    public RenderScriptBlur(Context context, int overlayColor) {
-        this(context, true, overlayColor);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
-    public RenderScriptBlur(Context context) {
-        this(context, false, Color.TRANSPARENT);
-    }
 
     /**
      * @param context Context to create the {@link RenderScript}
      */
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
-    public RenderScriptBlur(Context context, boolean drawOverlay, int overlayColor) {
+    public SupportRenderScriptBlur(Context context) {
         renderScript = RenderScript.create(context);
         blurScript = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
-        this.drawOverlay = drawOverlay;
-        this.overlayColor = overlayColor;
+        this.overlayScript = new ScriptC_BlendOverlay(renderScript);
     }
 
     private boolean canReuseAllocation(Bitmap bitmap) {
@@ -56,9 +43,17 @@ public final class RenderScriptBlur implements BlurAlgorithm {
      * @param blurRadius blur radius (1..25)
      * @return blurred bitmap
      */
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public final Bitmap blur(Bitmap bitmap, float blurRadius) {
+        return blur(bitmap, blurRadius, false, 0);
+    }
+
+    @Override
+    public Bitmap blur(Bitmap bitmap, float blurRadius, int overlayColor) {
+        return blur(bitmap, blurRadius, true, overlayColor);
+    }
+
+    public final Bitmap blur(Bitmap bitmap, float blurRadius, boolean drawOverlay, int overlayColor) {
         //Allocation will use the same backing array of pixels as bitmap if created with USAGE_SHARED flag
         Allocation inAllocation = Allocation.createFromBitmap(renderScript, bitmap);
 
@@ -71,22 +66,20 @@ public final class RenderScriptBlur implements BlurAlgorithm {
             lastBitmapHeight = bitmap.getHeight();
         }
 
-
         blurScript.setRadius(blurRadius);
         blurScript.setInput(inAllocation);
-
         //do not use inAllocation in forEach. it will cause visual artifacts on blurred Bitmap
         blurScript.forEach(outAllocation);
+
+        if (drawOverlay) {
+            overlayScript.invoke_setOverlayColor(overlayColor);
+            overlayScript.forEach_overlay(outAllocation, outAllocation);
+        }
+
         outAllocation.copyTo(bitmap);
 
         inAllocation.destroy();
         return bitmap;
-    }
-
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    @Override
-    public Bitmap blur(Bitmap bitmap, float blurRadius, int overlayColor) {
-        return blur(bitmap, blurRadius);
     }
 
     @Override

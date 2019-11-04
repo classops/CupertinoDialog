@@ -25,7 +25,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import eightbitlab.com.blurview.BlurView;
+import com.hanter.android.radwidget.cupertino.blur.BlurView;
+import com.hanter.android.radwidget.cupertino.blur.SupportRenderScriptBlur;
 
 public class CupertinoAlertDialog extends DialogFragment {
 

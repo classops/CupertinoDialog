@@ -1,4 +1,4 @@
-package eightbitlab.com.blurview;
+package com.hanter.android.radwidget.cupertino.blur;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -16,6 +16,8 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+
+import com.hanter.android.radwidget.cupertino.R;
 
 /**
  * FrameLayout that blurs its underlying content.

@@ -21,10 +21,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         when (v?.id) {
             R.id.btnAlert -> {
                 val actions = ArrayList<CupertinoAlertDialogAction>()
-                actions.add(CupertinoAlertDialogAction("test1", false, true))
-                actions.add(CupertinoAlertDialogAction("test2", R.style.CupertinoAlertDialogAction_Text_Green, false, false))
+                actions.add(CupertinoAlertDialogAction("Delete", false, true))
+                actions.add(CupertinoAlertDialogAction("Cancel", false, false))
 
-                CupertinoAlertDialog.newInstance("title", "", actions)
+                CupertinoAlertDialog.newInstance("Delete file?", "", actions)
                     .show(supportFragmentManager, "TEST")
             }
 

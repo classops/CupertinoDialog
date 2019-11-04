@@ -9,7 +9,7 @@
     tools:gravity="bottom"
     tools:layout_gravity="center_vertical">
 
-    <eightbitlab.com.blurview.BlurView
+    <com.hanter.android.radwidget.cupertino.blur.BlurView
         android:id="@+id/blurView"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
@@ -65,7 +65,7 @@
 
         </LinearLayout>
 
-    </eightbitlab.com.blurview.BlurView>
+    </com.hanter.android.radwidget.cupertino.blur.BlurView>
 
     <Button
         android:id="@+id/btnCancel"

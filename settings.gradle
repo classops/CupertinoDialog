@@ -1,2 +1,2 @@
-include ':app', ':blurview', ':cupertinodialog'
+include ':app', ':cupertinodialog'
 rootProject.name='CupertinoDialogDemo'

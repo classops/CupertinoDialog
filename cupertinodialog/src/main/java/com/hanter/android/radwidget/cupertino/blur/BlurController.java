@@ -1,4 +1,4 @@
-package eightbitlab.com.blurview;
+package com.hanter.android.radwidget.cupertino.blur;
 
 import android.graphics.Canvas;
 
