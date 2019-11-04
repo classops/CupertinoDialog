@@ -23,7 +23,7 @@
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/cupertino_alert_overlay"
+            android:background="@color/cupertinoAlertOverlay"
             android:gravity="center"
             android:paddingLeft="@dimen/cupertino_alert_edge_padding"
             android:paddingTop="@dimen/cupertino_alert_edge_padding"
@@ -39,7 +39,7 @@
             android:id="@+id/message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/cupertino_alert_overlay"
+            android:background="@color/cupertinoAlertOverlay"
             android:gravity="center"
             android:paddingLeft="@dimen/cupertino_alert_edge_padding"
             android:paddingTop="@dimen/cupertino_alert_edge_padding"
@@ -51,7 +51,7 @@
             tools:text="message" />
 
         <View
-            android:background="@color/cupertino_alert_button_divider"
+            android:background="@color/cupertinoAlertButtonDivider"
             android:layout_width="match_parent"
             android:layout_height="1px" />
 

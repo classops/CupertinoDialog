@@ -5,7 +5,7 @@
 
             <corners android:radius="@dimen/cupertino_dialog_corner_radius"/>
 
-            <solid android:color="#e8e8e8"/>
+            <solid android:color="#FFEAEAEA"/>
 
         </shape>
     </item>
@@ -15,7 +15,7 @@
 
             <corners android:radius="@dimen/cupertino_dialog_corner_radius"/>
 
-            <solid android:color="#ffffff"/>
+            <solid android:color="@color/cupertinoWhite"/>
 
         </shape>
     </item>

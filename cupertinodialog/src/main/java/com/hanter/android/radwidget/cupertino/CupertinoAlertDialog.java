@@ -60,7 +60,7 @@ public class CupertinoAlertDialog extends DialogFragment {
         args.putString(ARG_MESSAGE, message);
         args.putParcelableArrayList(ARG_ACTION_LIST, actions);
         fragment.setArguments(args);
-        fragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Dialog_Alert_Cupertino);
+        fragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Dialog_Cupertino_Alert);
         return fragment;
     }
 
@@ -147,8 +147,8 @@ public class CupertinoAlertDialog extends DialogFragment {
             ActionDividerDecoration dividerDecoration = new ActionDividerDecoration(
                     getContext(),
                     ActionDividerDecoration.HORIZONTAL,
-                    R.color.cupertino_alert_button_divider,
-                    R.color.cupertino_alert_overlay_pressed);
+                    R.color.cupertinoAlertButtonDivider,
+                    R.color.cupertinoAlertOverlayPressed);
             dividerDecoration.setDividerWidth(1);
             dividerDecoration.setHeaderDividersEnabled(false);
             rcvButtons.addItemDecoration(dividerDecoration);
@@ -158,8 +158,8 @@ public class CupertinoAlertDialog extends DialogFragment {
             ActionDividerDecoration dividerDecoration = new ActionDividerDecoration(
                     getContext(),
                     ActionDividerDecoration.VERTICAL,
-                    R.color.cupertino_alert_button_divider,
-                    R.color.cupertino_alert_overlay_pressed);
+                    R.color.cupertinoAlertButtonDivider,
+                    R.color.cupertinoAlertOverlayPressed);
             dividerDecoration.setDividerHeight(1);
             dividerDecoration.setHeaderDividersEnabled(false);
             rcvButtons.addItemDecoration(dividerDecoration);

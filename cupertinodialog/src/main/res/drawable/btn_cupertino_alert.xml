@@ -3,7 +3,7 @@
     <item android:state_pressed="true" >
         <shape android:shape="rectangle">
 
-            <solid android:color="@color/cupertino_alert_overlay_pressed"/>
+            <solid android:color="@color/cupertinoAlertOverlayPressed"/>
 
         </shape>
     </item>
@@ -11,7 +11,7 @@
     <item >
         <shape android:shape="rectangle">
 
-            <solid android:color="@color/cupertino_alert_overlay"/>
+            <solid android:color="@color/cupertinoAlertOverlay"/>
 
         </shape>
     </item>

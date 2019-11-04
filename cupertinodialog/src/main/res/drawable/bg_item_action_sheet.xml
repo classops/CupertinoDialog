@@ -3,7 +3,7 @@
     <item android:state_pressed="true" >
         <shape android:shape="rectangle">
 
-            <solid android:color="#A6E5E5EA"/>
+            <solid android:color="@color/actionSheetDialogOverlayPressed"/>
 
         </shape>
     </item>
@@ -11,7 +11,7 @@
     <item >
         <shape android:shape="rectangle">
 
-            <solid android:color="#D1F8F8F8"/>
+            <solid android:color="@color/actionSheetDialogOverlay"/>
 
         </shape>
     </item>

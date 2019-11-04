@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Dialog.ActionSheet" parent="Theme.AppCompat.Dialog">
+
+    <style name="Dialog.Cupertino" parent="Theme.AppCompat.Dialog" >
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFrame">@null</item>
@@ -12,26 +13,19 @@
         <item name="android:windowCloseOnTouchOutside">true</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.4</item>
+    </style>
+
+    <style name="Dialog.Cupertino.ActionSheet" parent="Dialog.Cupertino">
         <item name="android:windowAnimationStyle">@style/ActionSheetAnimation</item>
     </style>
 
     <style name="ActionSheetAnimation">
-        <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
-        <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
+        <item name="android:windowEnterAnimation">@anim/action_sheet_slide_in</item>
+        <item name="android:windowExitAnimation">@anim/action_sheet_slide_out</item>
     </style>
 
-    <style name="Dialog.Alert.Cupertino" parent="Theme.AppCompat.Dialog">
-        <item name="android:windowFullscreen">false</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
+    <style name="Dialog.Cupertino.Alert" parent="Dialog.Cupertino">
         <item name="android:windowIsFloating">true</item>
-        <item name="android:windowSoftInputMode">stateAlwaysHidden</item>
-        <item name="android:windowIsTranslucent">false</item>
-        <item name="android:windowCloseOnTouchOutside">true</item>
-        <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.4</item>
         <item name="android:windowMinWidthMinor">270dp</item>
         <item name="android:windowMinWidthMajor">310dp</item>

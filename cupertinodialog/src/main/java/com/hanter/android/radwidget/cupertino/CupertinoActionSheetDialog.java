@@ -69,7 +69,7 @@ public class CupertinoActionSheetDialog extends DialogFragment {
         args.putParcelableArrayList(ARG_ACTION_LIST, data);
         args.putParcelable(ARG_CANCEL_ACTION, cancelAction);
         fragment.setArguments(args);
-        fragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Dialog_ActionSheet);
+        fragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Dialog_Cupertino_ActionSheet);
         return fragment;
     }
 
@@ -160,8 +160,8 @@ public class CupertinoActionSheetDialog extends DialogFragment {
             ActionDividerDecoration dividerDecoration = new ActionDividerDecoration(
                     getContext(),
                     ActionDividerDecoration.VERTICAL,
-                    R.color.action_sheet_divider,
-                    R.color.action_sheet_divider_pressed);
+                    R.color.cupertinoActionSheetDivider,
+                    R.color.actionSheetDialogOverlayPressed);
             dividerDecoration.setDividerHeight(1);
             dividerDecoration.setHeaderDividersEnabled(!TextUtils.isEmpty(title) || !TextUtils.isEmpty(message));
             rcvActions.addItemDecoration(dividerDecoration);
