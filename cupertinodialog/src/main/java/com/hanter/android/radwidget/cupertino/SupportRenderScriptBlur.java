@@ -2,7 +2,6 @@ package com.hanter.android.radwidget.cupertino;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 
 import androidx.annotation.NonNull;
 import androidx.renderscript.Allocation;
@@ -26,18 +25,10 @@ public final class SupportRenderScriptBlur implements BlurAlgorithm {
     private int lastBitmapHeight = -1;
 
 
-    public SupportRenderScriptBlur(Context context, int overlayColor) {
-        this(context, true, overlayColor);
-    }
-
-    public SupportRenderScriptBlur(Context context) {
-        this(context, false, Color.TRANSPARENT);
-    }
-
     /**
      * @param context Context to create the {@link RenderScript}
      */
-    public SupportRenderScriptBlur(Context context, boolean drawOverlay, int overlayColor) {
+    public SupportRenderScriptBlur(Context context) {
         renderScript = RenderScript.create(context);
         blurScript = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
         this.overlayScript = new ScriptC_BlendOverlay(renderScript);

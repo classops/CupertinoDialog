@@ -49,9 +49,9 @@ final class BlockingBlurController implements BlurController {
     private Canvas internalCanvas;
     private Bitmap internalBitmap;
 
-    final View blurView;
-    private int overlayColor;
+    private final View blurView;
     private final ViewGroup rootView;
+    private int overlayColor;
     private final int[] rootLocation = new int[2];
     private final int[] blurViewLocation = new int[2];
     private final Rect bitmapRect = new Rect();
@@ -70,6 +70,8 @@ final class BlockingBlurController implements BlurController {
     };
 
     private boolean blurEnabled = false;
+    private int initWidth;
+    private int initHeight;
 
     @Nullable
     private Drawable frameClearDrawable;
@@ -116,6 +118,13 @@ final class BlockingBlurController implements BlurController {
     }
 
     void init(int measuredWidth, int measuredHeight) {
+        if (initWidth == measuredWidth && initHeight == measuredHeight) {
+            return;
+        }
+
+        initWidth = measuredWidth;
+        initHeight = measuredHeight;
+
         if (isZeroSized(measuredWidth, measuredHeight)) {
             blurEnabled = false;
             blurView.setWillNotDraw(true);
@@ -174,17 +183,10 @@ final class BlockingBlurController implements BlurController {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     blurView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 } else {
-                    legacyRemoveOnGlobalLayoutListener();
+                    blurView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 }
 
-                int measuredWidth = blurView.getMeasuredWidth();
-                int measuredHeight = blurView.getMeasuredHeight();
-
-                init(measuredWidth, measuredHeight);
-            }
-
-            void legacyRemoveOnGlobalLayoutListener() {
-                blurView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                init(blurView.getMeasuredWidth(), blurView.getMeasuredHeight());
             }
         });
     }
@@ -259,10 +261,7 @@ final class BlockingBlurController implements BlurController {
 
     @Override
     public void updateBlurViewSize() {
-        int measuredWidth = blurView.getMeasuredWidth();
-        int measuredHeight = blurView.getMeasuredHeight();
-
-        init(measuredWidth, measuredHeight);
+        init(blurView.getMeasuredWidth(), blurView.getMeasuredHeight());
     }
 
     @Override
@@ -310,7 +309,6 @@ final class BlockingBlurController implements BlurController {
     }
 
     void setBlurAutoUpdateInternal(boolean enabled) {
-        Log.d(TAG, "setBlurAutoUpdateInternal： " + enabled);
         blurView.getViewTreeObserver().removeOnPreDrawListener(drawListener);
         if (enabled) {
             blurView.getViewTreeObserver().addOnPreDrawListener(drawListener);
