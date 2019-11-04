@@ -4,7 +4,7 @@ IOS Style Dialog: AlertDialog, ActionSheetDialog
 
 ## 效果
 
-![CupertinoDialog](/screenshots/screenshots.jpg)
+![CupertinoDialogGallery](/screenshots/screenshots.jpg)
 
 ## 使用方法
 
@@ -20,7 +20,7 @@ allprojects {
 }
 
 dependencies {
-	implementation 'com.github.wangmingshuo:cupertinodialog:1.0.0'
+	implementation 'com.github.wangmingshuo:CupertinoDialog:1.0.0'
 }
 ```
 ### 使用
