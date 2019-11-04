@@ -150,7 +150,6 @@ public class CupertinoActionSheetDialog extends DialogFragment {
         actionAdapter.setOnItemClickListener(new OnItemClickListener(rcvActions) {
             @Override
             public void onItemClick(View v, int position) {
-                dismiss();
                 if (listener != null)
                     listener.onActionClick(CupertinoActionSheetDialog.this, position);
             }

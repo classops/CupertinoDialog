@@ -171,7 +171,6 @@ public class CupertinoAlertDialog extends DialogFragment {
         actionAdapter.setOnItemClickListener(new OnItemClickListener(rcvButtons) {
             @Override
             public void onItemClick(View v, int position) {
-                dismiss();
                 if (listener != null)
                     listener.onActionClick(CupertinoAlertDialog.this, position);
             }

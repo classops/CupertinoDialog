@@ -10,7 +10,8 @@ import com.hanter.android.radwidget.cupertino.CupertinoAlertDialogAction
 import java.util.*
 
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener, CupertinoAlertDialog.OnActionClickListener,
+    CupertinoActionSheetDialog.OnActionClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,4 +77,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    override fun onActionClick(dialog: CupertinoAlertDialog?, position: Int) {
+        dialog?.dismiss()
+    }
+
+    override fun onActionClick(dialog: CupertinoActionSheetDialog?, position: Int) {
+        dialog?.dismiss()
+    }
 }
