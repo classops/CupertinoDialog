@@ -84,6 +84,7 @@ public final class SupportRenderScriptBlur implements BlurAlgorithm {
 
     @Override
     public final void destroy() {
+        overlayScript.destroy();
         blurScript.destroy();
         renderScript.destroy();
         if (outAllocation != null) {

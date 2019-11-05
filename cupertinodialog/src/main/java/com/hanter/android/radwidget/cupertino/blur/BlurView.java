@@ -27,8 +27,9 @@ public class BlurView extends FrameLayout {
 
     private static final String TAG = BlurView.class.getSimpleName();
 
-    private Paint imagePaint;
     private Paint roundPaint;
+    private Path roundPath;
+    private RectF rectF;
     BlurController blurController = new NoOpController();
     private boolean round;
     private float roundCornerRadius;
@@ -61,13 +62,12 @@ public class BlurView extends FrameLayout {
 
         roundPaint = new Paint();
         roundPaint.setAntiAlias(true);
-        roundPaint.setColor(Color.WHITE);
+        roundPaint.setColor(Color.BLACK);
         roundPaint.setStyle(Paint.Style.FILL);
-        roundPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
+        roundPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
 
-        imagePaint = new Paint();
-        roundPaint.setAntiAlias(true);
-        imagePaint.setColor(Color.WHITE);
+        roundPath = new Path();
+        rectF = new RectF(0, 0, getWidth(), getHeight());
 
         for (int i = 0; i < radii.length; i++) {
             radii[i] = roundCornerRadius;
@@ -76,57 +76,36 @@ public class BlurView extends FrameLayout {
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        if (!round || roundCornerRadius == 0) {
-            super.dispatchDraw(canvas);
-            return;
-        }
-
-        canvas.saveLayer(new RectF(0, 0, canvas.getWidth(), canvas.getHeight()), imagePaint, Canvas.ALL_SAVE_FLAG);
         super.dispatchDraw(canvas);
-
-        drawTopLeft(canvas);
-        drawTopRight(canvas);
-        drawBottomLeft(canvas);
-        drawBottomRight(canvas);
-
-        canvas.restore();
+        drawRoundPath(canvas);
     }
 
     @Override
     public void draw(Canvas canvas) {
-        if (!round || roundCornerRadius == 0) {
-            boolean shouldDraw = blurController.draw(canvas);
-            if (shouldDraw) {
-                super.draw(canvas);
-            }
-            return;
-        }
-
-        canvas.saveLayer(new RectF(0, 0, getWidth(), getHeight()), imagePaint, Canvas.ALL_SAVE_FLAG);
-
         boolean shouldDraw = blurController.draw(canvas);
         if (shouldDraw) {
             super.draw(canvas);
+            drawRoundPath(canvas);
         }
-
-        drawTopLeft(canvas);
-        drawTopRight(canvas);
-        drawBottomLeft(canvas);
-        drawBottomRight(canvas);
-
-        canvas.restore();
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        updateRoundPath(w, h);
         blurController.updateBlurViewSize();
+    }
+
+    private void updateRoundPath(int w, int h) {
+        rectF.set(0, 0, w, h);
+        roundPath.reset();
+        roundPath.addRoundRect(rectF, radii, Path.Direction.CW);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        blurController.setBlurAutoUpdate(false);
+        this.blurController.destroy();
     }
 
     @Override
@@ -185,66 +164,8 @@ public class BlurView extends FrameLayout {
     }
 
     private void drawRoundPath(Canvas canvas) {
-        int width = getWidth();
-        int height = getHeight();
-        Path path = new Path();
-        path.addRoundRect(new RectF(0, 0, width, height), radii, Path.Direction.CCW);
-        canvas.drawPath(path, roundPaint);
-    }
-
-    private void drawTopLeft(Canvas canvas) {
-        if (roundCornerRadius > 0) {
-            Path path = new Path();
-            path.moveTo(0, roundCornerRadius);
-            path.lineTo(0, 0);
-            path.lineTo(roundCornerRadius, 0);
-            path.arcTo(new RectF(0, 0, roundCornerRadius * 2, roundCornerRadius * 2),
-                    -90, -90);
-            path.close();
-            canvas.drawPath(path, roundPaint);
-        }
-    }
-
-    private void drawTopRight(Canvas canvas) {
-        if (roundCornerRadius > 0) {
-            int width = getWidth();
-            Path path = new Path();
-            path.moveTo(width - roundCornerRadius, 0);
-            path.lineTo(width, 0);
-            path.lineTo(width, roundCornerRadius);
-            path.arcTo(new RectF(width - 2 * roundCornerRadius, 0, width,
-                    roundCornerRadius * 2), 0, -90);
-            path.close();
-            canvas.drawPath(path, roundPaint);
-        }
-    }
-
-    private void drawBottomLeft(Canvas canvas) {
-        if (roundCornerRadius > 0) {
-            int height = getHeight();
-            Path path = new Path();
-            path.moveTo(0, height - roundCornerRadius);
-            path.lineTo(0, height);
-            path.lineTo(roundCornerRadius, height);
-            path.arcTo(new RectF(0, height - 2 * roundCornerRadius,
-                    roundCornerRadius * 2, height), 90, 90);
-            path.close();
-            canvas.drawPath(path, roundPaint);
-        }
-    }
-
-    private void drawBottomRight(Canvas canvas) {
-        if (roundCornerRadius > 0) {
-            int height = getHeight();
-            int width = getWidth();
-            Path path = new Path();
-            path.moveTo(width - roundCornerRadius, height);
-            path.lineTo(width, height);
-            path.lineTo(width, height - roundCornerRadius);
-            path.arcTo(new RectF(width - 2 * roundCornerRadius, height - 2
-                    * roundCornerRadius, width, height), 0, 90);
-            path.close();
-            canvas.drawPath(path, roundPaint);
+        if (round && roundCornerRadius > 0) {
+            canvas.drawPath(roundPath, roundPaint);
         }
     }
 

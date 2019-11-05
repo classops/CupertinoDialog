@@ -20,11 +20,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.hanter.android.radwidget.cupertino.blur.BlurView;
 import com.hanter.android.radwidget.cupertino.blur.SupportRenderScriptBlur;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CupertinoActionSheetDialog extends DialogFragment {
 
@@ -115,8 +115,9 @@ public class CupertinoActionSheetDialog extends DialogFragment {
     private void initViews(View rootView) {
         if (getActivity() != null) {
             BlurView blurView = rootView.findViewById(R.id.blurView);
-            blurView.setupWith((ViewGroup) getActivity().getWindow().getDecorView())
-                    .setFrameClearDrawable(null)
+            ViewGroup decorView = (ViewGroup) getActivity().getWindow().getDecorView();
+            blurView.setupWith(decorView)
+                    .setFrameClearDrawable(decorView.getBackground())
                     .setBlurAlgorithm(new SupportRenderScriptBlur(getContext()))
                     .setBlurRadius(20)
                     .setHasFixedTransformationMatrix(true);
