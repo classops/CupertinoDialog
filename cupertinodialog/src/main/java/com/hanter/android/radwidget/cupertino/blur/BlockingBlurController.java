@@ -4,16 +4,12 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -33,7 +29,7 @@ final class BlockingBlurController implements BlurController {
 
     private static final String TAG = "BlockingBlurController";
 
-    private static final boolean OVERLAY_BY_CANVAS = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
+    private static final boolean BLEND_BY_CANVAS = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
 
     // Bitmap size should be divisible by ROUNDING_VALUE to meet stride requirement.
     // This will help avoiding an extra bitmap allocation when passing the bitmap to RenderScript for blur.
@@ -48,12 +44,12 @@ final class BlockingBlurController implements BlurController {
     private Canvas internalCanvas;
     private Bitmap internalBitmap;
 
-    private final View blurView;
+    private final BlurView blurView;
     private final ViewGroup rootView;
-    private int overlayColor;
     private final int[] rootLocation = new int[2];
     private final int[] blurViewLocation = new int[2];
     private final Rect bitmapRect = new Rect();
+    private final Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG);
 
     private final ViewTreeObserver.OnPreDrawListener drawListener = new ViewTreeObserver.OnPreDrawListener() {
         @Override
@@ -75,8 +71,6 @@ final class BlockingBlurController implements BlurController {
     @Nullable
     private Drawable frameClearDrawable;
     private boolean hasFixedTransformationMatrix;
-    private final Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG);
-    private final RectF blurViewRect = new RectF();
 
     /**
      * @param blurView View which will draw it's blurred underlying content
@@ -84,11 +78,9 @@ final class BlockingBlurController implements BlurController {
      *                 Can be Activity's root content layout (android.R.id.content)
      *                 or some of your custom root layouts.
      */
-    BlockingBlurController(@NonNull View blurView, @NonNull ViewGroup rootView,
-                           @ColorInt int overlayColor) {
+    BlockingBlurController(@NonNull BlurView blurView, @NonNull ViewGroup rootView) {
         this.rootView = rootView;
         this.blurView = blurView;
-        this.overlayColor = overlayColor;
         this.blurAlgorithm = new NoOpBlurAlgorithm();
 
         int measuredWidth = blurView.getMeasuredWidth();
@@ -139,8 +131,6 @@ final class BlockingBlurController implements BlurController {
         if (hasFixedTransformationMatrix) {
             setupInternalCanvasMatrix();
         }
-
-        blurViewRect.set(0, 0, measuredWidth, measuredHeight);
     }
 
     private boolean isZeroSized(int measuredWidth, int measuredHeight) {
@@ -167,7 +157,9 @@ final class BlockingBlurController implements BlurController {
             internalCanvas.restore();
         }
 
-        internalCanvas.drawColor(0x6604040F);
+        if (blurView.barrierColor != Color.TRANSPARENT) {
+            internalCanvas.drawColor(blurView.barrierColor);
+        }
 
         blurAndSave();
     }
@@ -237,20 +229,27 @@ final class BlockingBlurController implements BlurController {
 
         updateBlur();
 
-        canvas.drawBitmap(internalBitmap, bitmapRect, blurViewRect, paint);
+        canvas.drawBitmap(internalBitmap, bitmapRect, blurView.rectF, paint);
 
-        if (OVERLAY_BY_CANVAS) {
-            canvas.drawColor(overlayColor, PorterDuff.Mode.OVERLAY);
+        if (useCanvasBlend() && blurView.getPorterDuffMode() != null) {
+            canvas.drawColor(blurView.overlayColor, blurView.getPorterDuffMode());
         }
 
         return true;
     }
 
+    private boolean useCanvasBlend() {
+        return BLEND_BY_CANVAS || (blurView.overlayBlendMode != BlurView.LIGHTEN
+                && blurView.overlayBlendMode != BlurView.DARKEN
+                && blurView.overlayBlendMode != BlurView.OVERLAY);
+    }
+
     private void blurAndSave() {
-        if (OVERLAY_BY_CANVAS) {
+        if (useCanvasBlend()) {
             internalBitmap = blurAlgorithm.blur(internalBitmap, blurRadius);
         } else {
-            internalBitmap = blurAlgorithm.blur(internalBitmap, blurRadius, overlayColor);
+            internalBitmap = blurAlgorithm.blur(internalBitmap, blurRadius, blurView.overlayColor,
+                    blurView.overlayBlendMode);
         }
 
         if (!blurAlgorithm.canModifyBitmap()) {
@@ -330,12 +329,4 @@ final class BlockingBlurController implements BlurController {
         return this;
     }
 
-    @Override
-    public BlurViewFacade setOverlayColor(int overlayColor) {
-        if (this.overlayColor != overlayColor) {
-            this.overlayColor = overlayColor;
-            blurView.invalidate();
-        }
-        return this;
-    }
 }

@@ -14,8 +14,10 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         app:blv_hasRound="true"
-        app:blv_overlayColor="@android:color/white"
         app:blv_roundRadius="@dimen/cupertino_dialog_corner_radius"
+        app:blv_overlayColor="@android:color/white"
+        app:blv_overlayBlendMode="overlay"
+        app:blv_barrierColor="#6604040F"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 

@@ -1,7 +1,7 @@
 package com.hanter.android.radwidget.cupertino.blur;
 
 import android.graphics.drawable.Drawable;
-import androidx.annotation.ColorInt;
+
 import androidx.annotation.Nullable;
 
 public interface BlurViewFacade {
@@ -54,11 +54,4 @@ public interface BlurViewFacade {
      */
     BlurViewFacade setBlurAlgorithm(BlurAlgorithm algorithm);
 
-    /**
-     * Sets the color overlay to be drawn on top of blurred content
-     *
-     * @param overlayColor int color
-     * @return {@link BlurViewFacade}
-     */
-    BlurViewFacade setOverlayColor(@ColorInt int overlayColor);
 }

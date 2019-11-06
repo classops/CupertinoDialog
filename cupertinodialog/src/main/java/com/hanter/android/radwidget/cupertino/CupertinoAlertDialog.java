@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hanter.android.radwidget.cupertino.blur.BlurView;
-import com.hanter.android.radwidget.cupertino.blur.SupportRenderScriptBlur;
+import com.hanter.android.radwidget.cupertino.blur.RenderScriptBlur;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +110,7 @@ public class CupertinoAlertDialog extends DialogFragment {
             ViewGroup decorView = (ViewGroup) getActivity().getWindow().getDecorView();
             blurView.setupWith(decorView)
                     .setFrameClearDrawable(decorView.getBackground())
-                    .setBlurAlgorithm(new SupportRenderScriptBlur(getContext()))
+                    .setBlurAlgorithm(new RenderScriptBlur(getContext()))
                     .setBlurRadius(20)
                     .setHasFixedTransformationMatrix(true);
         }

@@ -31,11 +31,6 @@ class NoOpController implements BlurController {
     }
 
     @Override
-    public BlurViewFacade setOverlayColor(int overlayColor) {
-        return this;
-    }
-
-    @Override
     public BlurViewFacade setFrameClearDrawable(@Nullable Drawable windowBackground) {
         return this;
     }

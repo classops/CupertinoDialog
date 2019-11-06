@@ -11,7 +11,7 @@ class NoOpBlurAlgorithm implements BlurAlgorithm {
     }
 
     @Override
-    public Bitmap blur(Bitmap bitmap, float blurRadius, int overlayColor) {
+    public Bitmap blur(Bitmap bitmap, float blurRadius, int overlayColor, int blendMode) {
         return bitmap;
     }
 

@@ -13,7 +13,7 @@ public interface BlurAlgorithm {
      */
     Bitmap blur(Bitmap bitmap, float blurRadius);
 
-    Bitmap blur(Bitmap bitmap, float blurRadius, int overlayColor);
+    Bitmap blur(Bitmap bitmap, float blurRadius, int overlayColor, int blendMode);
 
     /**
      * Frees allocated resources
@@ -31,7 +31,7 @@ public interface BlurAlgorithm {
     boolean canModifyBitmap();
 
     /**
-     * Retrieve the {@link android.graphics.Bitmap.Config} on which the {@link BlurAlgorithm}
+     * Retrieve the {@link Bitmap.Config} on which the {@link BlurAlgorithm}
      * can actually work.
      *
      * @return bitmap config supported by the given blur algorithm.

@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.hanter.android.radwidget.cupertino.R;
 
@@ -27,16 +28,43 @@ public class BlurView extends FrameLayout {
 
     private static final String TAG = BlurView.class.getSimpleName();
 
+    public static final int NONE = -1;
+    public static final int CLEAR = 0;
+    public static final int SRC = 1;
+    public static final int DST = 2;
+    public static final int SRC_OVER = 3;
+    public static final int DST_OVER = 4;
+    public static final int SRC_IN = 5;
+    public static final int DST_IN = 6;
+    public static final int SRC_OUT = 7;
+    public static final int DST_OUT = 8;
+    public static final int SRC_ATOP = 9;
+    public static final int DST_ATOP = 10;
+    public static final int XOR = 11;
+    public static final int ADD = 12;
+    public static final int MULTIPLY = 13;
+    public static final int SCREEN = 14;
+
+    public static final int OVERLAY = 15;
+    public static final int LIGHTEN = 17;
+    public static final int DARKEN = 16;
+
+
+    private Paint imagePaint;
     private Paint roundPaint;
     private Path roundPath;
-    private RectF rectF;
+    private Path roundCornerPath;
+    RectF rectF;
     BlurController blurController = new NoOpController();
     private boolean round;
     private float roundCornerRadius;
     private float[] radii = new float[8];
 
     @ColorInt
-    private int overlayColor;
+    int barrierColor;
+    @ColorInt
+    int overlayColor;
+    int overlayBlendMode;
 
     public BlurView(Context context) {
         super(context);
@@ -55,38 +83,52 @@ public class BlurView extends FrameLayout {
 
     private void init(AttributeSet attrs, int defStyleAttr) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.BlurView, defStyleAttr, 0);
-        overlayColor = a.getColor(R.styleable.BlurView_blv_overlayColor, Color.TRANSPARENT);
         round = a.getBoolean(R.styleable.BlurView_blv_hasRound, false);
         roundCornerRadius = a.getDimensionPixelSize(R.styleable.BlurView_blv_roundRadius, 0);
+        barrierColor = a.getColor(R.styleable.BlurView_blv_barrierColor, Color.TRANSPARENT);
+        overlayColor = a.getColor(R.styleable.BlurView_blv_overlayColor, Color.TRANSPARENT);
+        overlayBlendMode = a.getColor(R.styleable.BlurView_blv_overlayBlendMode, SRC_OVER);
         a.recycle();
 
         roundPaint = new Paint();
         roundPaint.setAntiAlias(true);
-        roundPaint.setColor(Color.BLACK);
+        roundPaint.setDither(true);
+        roundPaint.setFilterBitmap(true);
+        roundPaint.setColor(Color.WHITE);
         roundPaint.setStyle(Paint.Style.FILL);
-        roundPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+        roundPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
 
         roundPath = new Path();
         rectF = new RectF(0, 0, getWidth(), getHeight());
-
         for (int i = 0; i < radii.length; i++) {
             radii[i] = roundCornerRadius;
         }
+        roundPath.addRoundRect(rectF, radii, Path.Direction.CCW);
+
+        roundCornerPath = new Path();
+
+        imagePaint = new Paint();
+        imagePaint.setAntiAlias(true);
+        imagePaint.setColor(Color.WHITE);
     }
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
+        canvas.saveLayer(new RectF(0, 0, getWidth(), getHeight()), imagePaint, Canvas.ALL_SAVE_FLAG);
         super.dispatchDraw(canvas);
         drawRoundPath(canvas);
+        canvas.restore();
     }
 
     @Override
     public void draw(Canvas canvas) {
+        canvas.saveLayer(new RectF(0, 0, getWidth(), getHeight()), imagePaint, Canvas.ALL_SAVE_FLAG);
         boolean shouldDraw = blurController.draw(canvas);
         if (shouldDraw) {
             super.draw(canvas);
-            drawRoundPath(canvas);
         }
+        drawRoundPath(canvas);
+        canvas.restore();
     }
 
     @Override
@@ -103,12 +145,6 @@ public class BlurView extends FrameLayout {
     }
 
     @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        this.blurController.destroy();
-    }
-
-    @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (!isHardwareAccelerated()) {
@@ -118,6 +154,17 @@ public class BlurView extends FrameLayout {
         }
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        this.blurController.destroy();
+    }
+
+    public void setOverlayColor(@ColorInt int overlayColor) {
+        this.overlayColor = overlayColor;
+        invalidate();
+    }
+
     /**
      * @param rootView root to start blur from.
      *                 Can be Activity's root content layout (android.R.id.content)
@@ -125,7 +172,7 @@ public class BlurView extends FrameLayout {
      * @return {@link BlurView} to setup needed params.
      */
     public BlurViewFacade setupWith(@NonNull ViewGroup rootView) {
-        BlurController blurController = new BlockingBlurController(this, rootView, overlayColor);
+        BlurController blurController = new BlockingBlurController(this, rootView);
         this.blurController.destroy();
         this.blurController = blurController;
 
@@ -139,14 +186,6 @@ public class BlurView extends FrameLayout {
      */
     public BlurViewFacade setBlurRadius(float radius) {
         return blurController.setBlurRadius(radius);
-    }
-
-    /**
-     * @see BlurViewFacade#setOverlayColor(int)
-     */
-    public BlurViewFacade setOverlayColor(@ColorInt int overlayColor) {
-        this.overlayColor = overlayColor;
-        return blurController.setOverlayColor(overlayColor);
     }
 
     /**
@@ -164,9 +203,110 @@ public class BlurView extends FrameLayout {
     }
 
     private void drawRoundPath(Canvas canvas) {
-        if (round && roundCornerRadius > 0) {
-            canvas.drawPath(roundPath, roundPaint);
+        if (!round || roundCornerRadius <= 0)
+            return;
+
+        roundCornerPath.reset();
+        addTopLeftPath();
+        addTopRightPath();
+        addBottomLeftPath();
+        addBottomRightPath();
+        canvas.drawPath(roundCornerPath, roundPaint);
+    }
+
+    private void addTopLeftPath() {
+        if (roundCornerRadius > 0) {
+            roundCornerPath.moveTo(0, roundCornerRadius);
+            roundCornerPath.lineTo(0, 0);
+            roundCornerPath.lineTo(roundCornerRadius, 0);
+            roundCornerPath.arcTo(new RectF(0, 0, roundCornerRadius * 2, roundCornerRadius * 2),
+                    -90, -90);
+            roundCornerPath.close();
         }
+    }
+
+    private void addTopRightPath() {
+        if (roundCornerRadius > 0) {
+            int width = getWidth();
+            roundCornerPath.moveTo(width - roundCornerRadius, 0);
+            roundCornerPath.lineTo(width, 0);
+            roundCornerPath.lineTo(width, roundCornerRadius);
+            roundCornerPath.arcTo(new RectF(width - 2 * roundCornerRadius, 0, width,
+                    roundCornerRadius * 2), 0, -90);
+            roundCornerPath.close();
+        }
+    }
+
+    private void addBottomLeftPath() {
+        if (roundCornerRadius > 0) {
+            int height = getHeight();
+            roundCornerPath.moveTo(0, height - roundCornerRadius);
+            roundCornerPath.lineTo(0, height);
+            roundCornerPath.lineTo(roundCornerRadius, height);
+            roundCornerPath.arcTo(new RectF(0, height - 2 * roundCornerRadius,
+                    roundCornerRadius * 2, height), 90, 90);
+            roundCornerPath.close();
+        }
+    }
+
+    private void addBottomRightPath() {
+        if (roundCornerRadius > 0) {
+            int height = getHeight();
+            int width = getWidth();
+            roundCornerPath.moveTo(width - roundCornerRadius, height);
+            roundCornerPath.lineTo(width, height);
+            roundCornerPath.lineTo(width, height - roundCornerRadius);
+            roundCornerPath.arcTo(new RectF(width - 2 * roundCornerRadius, height - 2
+                    * roundCornerRadius, width, height), 0, 90);
+            roundCornerPath.close();
+        }
+    }
+
+    @Nullable
+    PorterDuff.Mode getPorterDuffMode() {
+        switch (overlayBlendMode) {
+            default:
+            case -1:
+                return null;
+
+            case 0:
+                return PorterDuff.Mode.CLEAR;
+            case 1:
+                return PorterDuff.Mode.SRC;
+            case 2:
+                return PorterDuff.Mode.DST;
+            case 3:
+                return PorterDuff.Mode.SRC_OVER;
+            case 4:
+                return PorterDuff.Mode.DST_OVER;
+            case 5:
+                return PorterDuff.Mode.SRC_IN;
+            case 6:
+                return PorterDuff.Mode.DST_IN;
+            case 7:
+                return PorterDuff.Mode.SRC_OUT;
+            case 8:
+                return PorterDuff.Mode.DST_OUT;
+            case 9:
+                return PorterDuff.Mode.SRC_ATOP;
+            case 10:
+                return PorterDuff.Mode.DST_ATOP;
+            case 11:
+                return PorterDuff.Mode.XOR;
+            case 16:
+                return PorterDuff.Mode.DARKEN;
+            case 17:
+                return PorterDuff.Mode.LIGHTEN;
+            case 13:
+                return PorterDuff.Mode.MULTIPLY;
+            case 14:
+                return PorterDuff.Mode.SCREEN;
+            case 12:
+                return PorterDuff.Mode.ADD;
+            case 15:
+                return PorterDuff.Mode.OVERLAY;
+        }
+
     }
 
 }
