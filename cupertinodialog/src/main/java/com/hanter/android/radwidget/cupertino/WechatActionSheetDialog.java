@@ -5,21 +5,19 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hanter.android.radwidget.cupertino.blur.BlurView;
@@ -28,51 +26,52 @@ import com.hanter.android.radwidget.cupertino.blur.RenderScriptBlur;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CupertinoAlertDialog extends DialogFragment {
-
-    private static final String TAG = "CupertinoAlertDialog";
+public class WechatActionSheetDialog extends DialogFragment {
 
     private static final String ARG_TITLE = "title";
     private static final String ARG_MESSAGE = "message";
     private static final String ARG_ACTION_LIST = "actionList";
+    private static final String ARG_CANCEL_ACTION = "cancel";
 
     private String title;
     private String message;
-    private RecyclerView rcvButtons;
-    private List<CupertinoAlertDialogAction> actionList;
+    private List<CupertinoActionSheetAction> actionList;
+    private CupertinoActionSheetAction cancelAction;
+    private RecyclerView rcvActions;
+    private ActionAdapter actionAdapter;
     private OnActionClickListener listener;
 
     public interface OnActionClickListener {
-        void onActionClick(CupertinoAlertDialog dialog, int position);
+        void onActionClick(WechatActionSheetDialog dialog, int position);
     }
 
-    public static CupertinoAlertDialog newInstance(String title, String message, List<String> actions) {
-        ArrayList<CupertinoAlertDialogAction> list = new ArrayList<>();
+    public static WechatActionSheetDialog newInstance(String title, String message, List<String> actions) {
+        ArrayList<CupertinoActionSheetAction> list = new ArrayList<>();
         for (String action : actions) {
-            list.add(CupertinoAlertDialogAction.create(action));
+            list.add(CupertinoActionSheetAction.create(action));
         }
-        return newInstance(title, message, list);
+        CupertinoActionSheetAction cancelAction = new CupertinoActionSheetAction("取消", false, false);
+        return newInstance(title, message, list, cancelAction);
     }
 
-    public static CupertinoAlertDialog newInstance(String title, String message, ArrayList<CupertinoAlertDialogAction> actions) {
-        CupertinoAlertDialog fragment = new CupertinoAlertDialog();
+    public static WechatActionSheetDialog newInstance(String title, String message,
+                                                      ArrayList<CupertinoActionSheetAction> data) {
+        return newInstance(title, message, data, null);
+    }
+
+    public static WechatActionSheetDialog newInstance(String title,
+                                                      String message,
+                                                      ArrayList<CupertinoActionSheetAction> data,
+                                                      CupertinoActionSheetAction cancelAction) {
+        WechatActionSheetDialog fragment = new WechatActionSheetDialog();
         Bundle args = new Bundle();
         args.putString(ARG_TITLE, title);
         args.putString(ARG_MESSAGE, message);
-        args.putParcelableArrayList(ARG_ACTION_LIST, actions);
+        args.putParcelableArrayList(ARG_ACTION_LIST, data);
+        args.putParcelable(ARG_CANCEL_ACTION, cancelAction);
         fragment.setArguments(args);
-        fragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Dialog_Cupertino_Alert);
+        fragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Dialog_Cupertino_ActionSheet);
         return fragment;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (getDialog() != null && getDialog().getWindow() != null) {
-            Window window = getDialog().getWindow();
-            window.setLayout(WindowManager.LayoutParams.WRAP_CONTENT,
-                    WindowManager.LayoutParams.WRAP_CONTENT);
-        }
     }
 
     @Override
@@ -83,6 +82,7 @@ public class CupertinoAlertDialog extends DialogFragment {
             title = getArguments().getString(ARG_TITLE);
             message = getArguments().getString(ARG_MESSAGE);
             actionList = getArguments().getParcelableArrayList(ARG_ACTION_LIST);
+            cancelAction = getArguments().getParcelable(ARG_CANCEL_ACTION);
         }
     }
 
@@ -94,17 +94,25 @@ public class CupertinoAlertDialog extends DialogFragment {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            Window window = getDialog().getWindow();
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setGravity(Gravity.BOTTOM);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.dialog_cupertino_alert, container, false);
+        View rootView = inflater.inflate(R.layout.dialog_wechat_action_sheet, container, false);
         initViews(rootView);
         return rootView;
     }
 
     private void initViews(View rootView) {
-        Log.d(TAG, "activity: " + getActivity());
-
         if (getActivity() != null) {
             BlurView blurView = rootView.findViewById(R.id.blurView);
             ViewGroup decorView = (ViewGroup) getActivity().getWindow().getDecorView();
@@ -122,12 +130,6 @@ public class CupertinoAlertDialog extends DialogFragment {
             tvTitle.setVisibility(View.GONE);
         }
 
-        int edgePadding = getResources().getDimensionPixelSize(R.dimen.cupertino_alert_edge_padding);
-        int extraPadding = getResources().getDimensionPixelSize(R.dimen.cupertino_alert_extra_padding);
-
-        tvTitle.setPadding(edgePadding, edgePadding, edgePadding,
-                TextUtils.isEmpty(message) ? edgePadding : extraPadding);
-
         TextView tvMessage = rootView.findViewById(R.id.message);
 
         tvMessage.setText(message);
@@ -135,48 +137,60 @@ public class CupertinoAlertDialog extends DialogFragment {
             tvMessage.setVisibility(View.GONE);
         }
 
-        tvMessage.setPadding(edgePadding, TextUtils.isEmpty(title) ? edgePadding : extraPadding,
-                edgePadding, edgePadding);
+        int paddingHorizontal = getResources().getDimensionPixelSize(R.dimen.action_sheet_content_padding_horizontal);
+        int paddingVertical = getResources().getDimensionPixelSize(R.dimen.action_sheet_content_padding_vertical);
+        tvMessage.setPadding(
+                paddingHorizontal,
+                TextUtils.isEmpty(title) ? paddingVertical : 0,
+                paddingHorizontal,
+                TextUtils.isEmpty(title) ? paddingVertical : getResources().getDimensionPixelSize(R.dimen.action_sheet_message_padding_top_without_title)
+        );
 
-        rcvButtons = rootView.findViewById(R.id.rcvButtons);
-
-        RecyclerView.LayoutManager layoutManager;
-        if (actionList.size() == 1) {
-            layoutManager = new GridLayoutManager(getContext(), 1);
-        } else if (actionList.size() == 2) {
-            layoutManager = new GridLayoutManager(getContext(), 2);
-
-            ActionDividerDecoration dividerDecoration = new ActionDividerDecoration(
-                    requireContext(),
-                    ActionDividerDecoration.HORIZONTAL,
-                    R.color.cupertinoAlertButtonDivider,
-                    R.color.cupertinoAlertOverlayPressed);
-            dividerDecoration.setDividerWidth(1);
-            dividerDecoration.setHeaderDividersEnabled(false);
-            rcvButtons.addItemDecoration(dividerDecoration);
-
-        } else {
-            layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-            ActionDividerDecoration dividerDecoration = new ActionDividerDecoration(
-                    requireContext(),
-                    ActionDividerDecoration.VERTICAL,
-                    R.color.cupertinoAlertButtonDivider,
-                    R.color.cupertinoAlertOverlayPressed);
-            dividerDecoration.setDividerHeight(1);
-            dividerDecoration.setHeaderDividersEnabled(false);
-            rcvButtons.addItemDecoration(dividerDecoration);
-        }
-        rcvButtons.setLayoutManager(layoutManager);
-
-        ActionAdapter actionAdapter = new ActionAdapter(rcvButtons, actionList);
-        actionAdapter.setOnItemClickListener(new OnItemClickListener(rcvButtons) {
+        rcvActions = rootView.findViewById(R.id.rcvActions);
+        actionAdapter = new ActionAdapter(rcvActions, actionList);
+        actionAdapter.setOnItemClickListener(new OnItemClickListener(rcvActions) {
             @Override
             public void onItemClick(View v, int position) {
                 if (listener != null)
-                    listener.onActionClick(CupertinoAlertDialog.this, position);
+                    listener.onActionClick(WechatActionSheetDialog.this, position);
             }
         });
-        rcvButtons.setAdapter(actionAdapter);
+        rcvActions.setAdapter(actionAdapter);
+
+        if (getContext() != null) {
+            ActionDividerDecoration dividerDecoration = new ActionDividerDecoration(
+                    getContext(),
+                    ActionDividerDecoration.VERTICAL,
+                    R.color.cupertinoActionSheetDivider,
+                    R.color.actionSheetDialogOverlayPressed);
+            dividerDecoration.setDividerHeight(1);
+            dividerDecoration.setHeaderDividersEnabled(!TextUtils.isEmpty(title) || !TextUtils.isEmpty(message));
+            rcvActions.addItemDecoration(dividerDecoration);
+        }
+
+        Button btnCancel = rootView.findViewById(R.id.btnCancel);
+        if (cancelAction == null) {
+            btnCancel.setVisibility(View.GONE);
+        } else {
+            btnCancel.setText(cancelAction.getAction());
+            if (cancelAction.isDestructiveAction()) {
+                btnCancel.setTextColor(CupertinoColors.destructiveRed);
+            } else {
+                btnCancel.setTextColor(0xFF1F1F1F);
+            }
+            if (cancelAction.isDefaultAction()) {
+                btnCancel.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                btnCancel.setTypeface(Typeface.DEFAULT);
+            }
+
+            btnCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dismiss();
+                }
+            });
+        }
     }
 
     public void setListener(OnActionClickListener listener) {
@@ -189,9 +203,9 @@ public class CupertinoAlertDialog extends DialogFragment {
         private final RecyclerView recyclerView;
         private OnItemClickListener onItemClickListener;
         @Nullable
-        private final List<CupertinoAlertDialogAction> actionList;
+        private final List<CupertinoActionSheetAction> actionList;
 
-        ActionAdapter(RecyclerView recyclerView, @Nullable List<CupertinoAlertDialogAction> actionList) {
+        ActionAdapter(RecyclerView recyclerView, @Nullable List<CupertinoActionSheetAction> actionList) {
             this.recyclerView = recyclerView;
             this.actionList = actionList;
         }
@@ -199,36 +213,35 @@ public class CupertinoAlertDialog extends DialogFragment {
         @NonNull
         @Override
         public ActionAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.cupertino_alert_button, parent, false));
+            return new ViewHolder(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_action_sheet_wechat, parent, false));
         }
 
         @SuppressLint("ClickableViewAccessibility")
         @Override
         public void onBindViewHolder(@NonNull ActionAdapter.ViewHolder holder, int position) {
-            CupertinoAlertDialogAction item = getItem(position);
+
+            CupertinoActionSheetAction item = getItem(position);
 
             if (item == null)
                 return;
 
             holder.action.setText(item.getAction());
-            holder.action.setText(item.getAction());
             if (item.isDestructiveAction()) {
                 holder.action.setTextColor(CupertinoColors.destructiveRed);
             } else {
-                holder.action.setTextColor(CupertinoColors.activeBlue);
+                holder.action.setTextColor(0xFF1F1F1F);
             }
-
-            TextViewCompat.setTextAppearance(holder.action, item.getActionStyle());
-
             if (item.isDefaultAction()) {
                 holder.action.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                holder.action.setTypeface(Typeface.DEFAULT);
             }
-            holder.action.getPaint().setFakeBoldText(true);
             holder.action.setOnActionDownChangeListener(this);
             holder.action.setOnClickListener(onItemClickListener);
         }
 
-        CupertinoAlertDialogAction getItem(int position) {
+        CupertinoActionSheetAction getItem(int position) {
             if (actionList == null || position >= actionList.size() || position < 0) {
                 return null;
             } else {
@@ -256,12 +269,12 @@ public class CupertinoAlertDialog extends DialogFragment {
 
             ViewHolder(View view) {
                 super(view);
-                action = (CupertinoDialogActionButton) view;
+                action = view.findViewById(R.id.action);
             }
         }
     }
 
-    static abstract class OnItemClickListener implements View.OnClickListener {
+    public static abstract class OnItemClickListener implements View.OnClickListener {
 
         private RecyclerView recyclerView;
 

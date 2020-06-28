@@ -80,5 +80,19 @@
         android:layout_gravity="center_horizontal"
         android:layout_height="52dp" />
 
+    <Button
+        android:id="@+id/btnWechatActionSheet"
+        android:text="Wechat Action Sheet"
+        android:textSize="18dp"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:background="@drawable/btn_round_8dp"
+        android:layout_width="215dp"
+        android:textColor="#FFF"
+        android:onClick="onClick"
+        android:layout_marginTop="18dp"
+        android:textAllCaps="false"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="52dp" />
+
 
 </LinearLayout>

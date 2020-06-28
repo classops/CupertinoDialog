@@ -3,10 +3,7 @@ package com.example.cupertinodialogdemo
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.hanter.android.radwidget.cupertino.CupertinoActionSheetAction
-import com.hanter.android.radwidget.cupertino.CupertinoActionSheetDialog
-import com.hanter.android.radwidget.cupertino.CupertinoAlertDialog
-import com.hanter.android.radwidget.cupertino.CupertinoAlertDialogAction
+import com.hanter.android.radwidget.cupertino.*
 import java.util.*
 
 
@@ -72,6 +69,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, CupertinoAlertDi
                 cancelAction.isDefaultAction = true
 
                 CupertinoActionSheetDialog.newInstance("title", "message", actions, cancelAction)
+                    .show(supportFragmentManager, "TEST")
+            }
+
+            R.id.btnWechatActionSheet -> {
+                val actions = ArrayList<CupertinoActionSheetAction>()
+                actions.add(CupertinoActionSheetAction.create("取消"))
+                actions.add(CupertinoActionSheetAction.create("取消"))
+                actions.add(CupertinoActionSheetAction.create("取消"))
+
+                val cancelAction = CupertinoActionSheetAction("取消")
+                WechatActionSheetDialog.newInstance(null, null, actions, cancelAction)
                     .show(supportFragmentManager, "TEST")
             }
         }

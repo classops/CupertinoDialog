@@ -2,6 +2,10 @@
 <resources>
     <declare-styleable name="BlurView">
         <attr name="blv_hasRound" format="boolean" />
+        <attr name="blv_hasTopLeftRound" format="boolean" />
+        <attr name="blv_hasTopRightRound" format="boolean" />
+        <attr name="blv_hasBottomLeftRound" format="boolean" />
+        <attr name="blv_hasBottomRightRound" format="boolean" />
         <attr name="blv_roundRadius" format="dimension" />
         <attr name="blv_barrierColor" format="color" />
         <attr name="blv_overlayColor" format="color" />

@@ -20,6 +20,8 @@ import androidx.annotation.Nullable;
 
 import com.hanter.android.radwidget.cupertino.R;
 
+import java.util.Arrays;
+
 /**
  * FrameLayout that blurs its underlying content.
  * Can have children and draw them over blurred background.
@@ -57,6 +59,10 @@ public class BlurView extends FrameLayout {
     RectF rectF;
     BlurController blurController = new NoOpController();
     private boolean round;
+    private boolean topLeftRound;
+    private boolean topRightRound;
+    private boolean bottomLeftRound;
+    private boolean bottomRightRound;
     private float roundCornerRadius;
     private float[] radii = new float[8];
 
@@ -84,6 +90,10 @@ public class BlurView extends FrameLayout {
     private void init(AttributeSet attrs, int defStyleAttr) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.BlurView, defStyleAttr, 0);
         round = a.getBoolean(R.styleable.BlurView_blv_hasRound, false);
+        topLeftRound = a.getBoolean(R.styleable.BlurView_blv_hasTopLeftRound, false);
+        topRightRound = a.getBoolean(R.styleable.BlurView_blv_hasTopRightRound, false);
+        bottomLeftRound = a.getBoolean(R.styleable.BlurView_blv_hasBottomLeftRound, false);
+        bottomRightRound = a.getBoolean(R.styleable.BlurView_blv_hasBottomRightRound, false);
         roundCornerRadius = a.getDimensionPixelSize(R.styleable.BlurView_blv_roundRadius, 0);
         barrierColor = a.getColor(R.styleable.BlurView_blv_barrierColor, Color.TRANSPARENT);
         overlayColor = a.getColor(R.styleable.BlurView_blv_overlayColor, Color.TRANSPARENT);
@@ -100,9 +110,7 @@ public class BlurView extends FrameLayout {
 
         roundPath = new Path();
         rectF = new RectF(0, 0, getWidth(), getHeight());
-        for (int i = 0; i < radii.length; i++) {
-            radii[i] = roundCornerRadius;
-        }
+        Arrays.fill(radii, roundCornerRadius);
         roundPath.addRoundRect(rectF, radii, Path.Direction.CCW);
 
         roundCornerPath = new Path();
@@ -202,15 +210,34 @@ public class BlurView extends FrameLayout {
         return blurController.setBlurEnabled(enabled);
     }
 
+    private boolean hasRound() {
+        return round || topLeftRound || topRightRound || bottomLeftRound || bottomRightRound;
+    }
+
     private void drawRoundPath(Canvas canvas) {
-        if (!round || roundCornerRadius <= 0)
+        if (!hasRound() || roundCornerRadius <= 0)
             return;
 
         roundCornerPath.reset();
-        addTopLeftPath();
-        addTopRightPath();
-        addBottomLeftPath();
-        addBottomRightPath();
+        if (round) {
+            addTopLeftPath();
+            addTopRightPath();
+            addBottomLeftPath();
+            addBottomRightPath();
+        } else {
+            if (topLeftRound) {
+                addTopLeftPath();
+            }
+            if (topRightRound) {
+                addTopRightPath();
+            }
+            if (bottomLeftRound) {
+                addBottomLeftPath();
+            }
+            if (bottomRightRound) {
+                addBottomRightPath();
+            }
+        }
         canvas.drawPath(roundCornerPath, roundPaint);
     }
 
