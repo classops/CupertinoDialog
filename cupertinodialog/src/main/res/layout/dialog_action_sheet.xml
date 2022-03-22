@@ -69,19 +69,15 @@
 
     </com.hanter.android.radwidget.cupertino.blur.BlurView>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnCancel"
-        style="@style/Widget.AppCompat.Button.Borderless"
+        style="@style/CupertinoActionSheetCancelButton"
         android:layout_width="match_parent"
         android:layout_height="56dp"
+        android:layout_below="@id/blurView"
         android:layout_marginLeft="9dp"
         android:layout_marginTop="8dp"
         android:layout_marginRight="9dp"
-        android:layout_below="@id/blurView"
-        android:background="@drawable/btn_action_sheet_cancel"
-        android:gravity="center"
-        android:text="取消"
-        android:textColor="#066cf8"
-        android:textSize="20dp" />
+        tools:text="Cancel" />
 
 </RelativeLayout>
