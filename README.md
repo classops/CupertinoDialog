@@ -20,7 +20,7 @@ allprojects {
 }
 
 dependencies {
-	implementation 'com.github.wangmingshuo:CupertinoDialog:1.0.0'
+	implementation 'com.github.wangmingshuo:CupertinoDialog:1.0.1'
 }
 ```
 ### 使用
